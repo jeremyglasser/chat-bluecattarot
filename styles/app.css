@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  background: linear-gradient(180deg, rgb(117, 81, 194), rgb(255, 255, 255));
+  background: linear-gradient(180deg, var(--palette-secondary), var(--palette-neutral));
   display: flex;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   height: 100vh;
@@ -27,9 +27,11 @@ button {
   transition: border-color 0.25s;
   color: white;
 }
+
 button:hover {
-  border-color: #646cff;
+  border-color: var(--palette-secondary);
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -56,10 +58,10 @@ li {
 }
 
 li:hover {
-  background: #dadbf9;
+  background: var(--palette-accent);
 }
 
 a {
-  font-weight: 800;
   text-decoration: none;
+  color: var(--palette-secondary);
 }
