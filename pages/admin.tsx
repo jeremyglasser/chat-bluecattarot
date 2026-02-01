@@ -11,6 +11,8 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
     const [keys, setKeys] = useState<Array<Schema["AccessKey"]["type"]>>([]);
     const [newName, setNewName] = useState("");
     const [newLimit, setNewLimit] = useState(10);
+    const [editingKey, setEditingKey] = useState<string | null>(null);
+    const [editLimit, setEditLimit] = useState<number>(10);
 
     useEffect(() => {
         fetchKeys();
@@ -62,6 +64,20 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
         fetchKeys();
     };
 
+    const updateLimit = async (key: string) => {
+        await client.models.AccessKey.update({
+            key,
+            maxUsage: editLimit,
+        });
+        setEditingKey(null);
+        fetchKeys();
+    };
+
+    const startEditing = (key: string, currentLimit: number) => {
+        setEditingKey(key);
+        setEditLimit(currentLimit);
+    };
+
     return (
         <main style={{ padding: "40px", maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -107,15 +123,43 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
                             <tr key={k.key} style={{ borderBottom: "1px solid #eee" }}>
                                 <td style={{ padding: "16px 8px" }}><code>{k.key}</code></td>
                                 <td style={{ padding: "16px 8px" }}>{k.name}</td>
-                                <td style={{ padding: "16px 8px" }}>{k.usageCount} / {k.maxUsage}</td>
+                                <td style={{ padding: "16px 8px" }}>
+                                    {k.usageCount} / {editingKey === k.key ? (
+                                        <input
+                                            type="number"
+                                            value={editLimit}
+                                            onChange={(e) => setEditLimit(parseInt(e.target.value))}
+                                            style={{ width: "60px", padding: "4px" }}
+                                            onKeyDown={(e) => e.key === 'Enter' && updateLimit(k.key)}
+                                        />
+                                    ) : (
+                                        k.maxUsage
+                                    )}
+                                </td>
                                 <td style={{ padding: "16px 8px" }}>{k.isActive ? "✅ Active" : "❌ Inactive"}</td>
                                 <td style={{ padding: "16px 8px" }}>
-                                    <button onClick={() => toggleKey(k.key, !!k.isActive)} style={{ fontSize: "0.8em", marginRight: "8px" }}>
-                                        {k.isActive ? "Deactivate" : "Activate"}
-                                    </button>
-                                    <button onClick={() => deleteKey(k.key)} style={{ fontSize: "0.8em", background: "#ff4d4d", marginRight: "8px" }}>
-                                        Delete
-                                    </button>
+                                    {editingKey === k.key ? (
+                                        <>
+                                            <button onClick={() => updateLimit(k.key)} style={{ fontSize: "0.8em", background: "#4caf50", marginRight: "8px" }}>
+                                                Save
+                                            </button>
+                                            <button onClick={() => setEditingKey(null)} style={{ fontSize: "0.8em", marginRight: "8px" }}>
+                                                Cancel
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button onClick={() => startEditing(k.key, k.maxUsage || 0)} style={{ fontSize: "0.8em", marginRight: "8px" }}>
+                                                Edit Limit
+                                            </button>
+                                            <button onClick={() => toggleKey(k.key, !!k.isActive)} style={{ fontSize: "0.8em", marginRight: "8px" }}>
+                                                {k.isActive ? "Deactivate" : "Activate"}
+                                            </button>
+                                            <button onClick={() => deleteKey(k.key)} style={{ fontSize: "0.8em", background: "#ff4d4d", marginRight: "8px" }}>
+                                                Delete
+                                            </button>
+                                        </>
+                                    )}
                                     <a href={`/?key=${k.key}`} target="_blank" style={{ fontSize: "0.8em", color: "var(--palette-secondary)", textDecoration: "underline" }}>
                                         View Link
                                     </a>
