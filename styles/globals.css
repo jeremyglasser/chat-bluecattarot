@@ -1,48 +1,50 @@
 :root {
+  --palette-primary: #FFFFFF;
+  --palette-secondary: #4A90E2;
+  --palette-accent: #A0D2EB;
+  --palette-neutral: #0D1117;
+
+  --card-bg: #161B22;
+  --border-color: #30363D;
+  --text-primary: #F8F9FA;
+  --text-secondary: #C9D1D9;
+  --text-muted: #8B949E;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+
+  /* Amplify UI Overrides for Dark Mode */
+  --amplify-colors-brand-primary-10: var(--palette-accent);
+  --amplify-colors-brand-primary-80: var(--palette-secondary);
+  --amplify-colors-brand-primary-90: var(--palette-primary);
+  --amplify-colors-brand-primary-100: var(--palette-primary);
+  --amplify-colors-font-primary: var(--text-primary);
+  --amplify-colors-font-secondary: var(--text-secondary);
+  --amplify-colors-background-primary: var(--palette-neutral);
+  --amplify-colors-background-secondary: var(--card-bg);
+  --amplify-colors-border-primary: var(--border-color);
+
+  --max-width: 1100px;
+  --border-radius: 12px;
+}
+
+[data-theme='light'] {
   --palette-primary: #1A2238;
   --palette-secondary: #4A90E2;
   --palette-accent: #A0D2EB;
   --palette-neutral: #F8F9FA;
 
-  /* Amplify UI Overrides */
-  --amplify-colors-brand-primary-10: var(--palette-accent);
-  --amplify-colors-brand-primary-80: var(--palette-secondary);
-  --amplify-colors-brand-primary-90: var(--palette-primary);
-  --amplify-colors-brand-primary-100: var(--palette-primary);
+  --card-bg: #FFFFFF;
+  --border-color: #EEEEEE;
+  --text-primary: #1A2238;
+  --text-secondary: #444444;
+  --text-muted: #666666;
+  --shadow-color: rgba(26, 34, 56, 0.08);
 
-  --max-width: 1100px;
-  --border-radius: 12px;
-  --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
-    "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
-    "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
-
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-
-  --primary-glow: conic-gradient(from 180deg at 50% 50%,
-      #16abff33 0deg,
-      #0885ff33 55deg,
-      #54d6ff33 120deg,
-      #0071ff33 160deg,
-      transparent 360deg);
-  --secondary-glow: radial-gradient(rgba(255, 255, 255, 1),
-      rgba(255, 255, 255, 0));
-
-  --tile-start-rgb: 239, 245, 249;
-  --tile-end-rgb: 228, 232, 233;
-  --tile-border: conic-gradient(#00000080,
-      #00000040,
-      #00000030,
-      #00000020,
-      #00000010,
-      #00000010,
-      #00000080);
-
-  --callout-rgb: 238, 240, 241;
-  --callout-border-rgb: 172, 175, 176;
-  --card-rgb: 180, 185, 188;
-  --card-border-rgb: 131, 134, 135;
+  /* Amplify UI Overrides for Light Mode */
+  --amplify-colors-font-primary: var(--text-primary);
+  --amplify-colors-font-secondary: var(--text-secondary);
+  --amplify-colors-background-primary: var(--palette-neutral);
+  --amplify-colors-background-secondary: var(--card-bg);
+  --amplify-colors-border-primary: var(--border-color);
 }
 
 @media (prefers-color-scheme: dark) {

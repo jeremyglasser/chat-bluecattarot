@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import { useRouter } from "next/router";
-import ProfilePage from "@/components/ProfilePage";
+import { ChatInterface } from "@/components/ChatInterface";
 
 const client = generateClient<Schema>({
   authMode: "apiKey",
@@ -84,9 +84,9 @@ export default function App() {
   if (accessGranted === false) {
     return (
       <main className="status-container">
-        <h1 style={{ color: "var(--palette-secondary)", fontSize: "2.5rem" }}>{errorHeader}</h1>
-        <p style={{ maxWidth: "500px", margin: "20px 0" }}>{errorMsg}</p>
-        <div style={{ marginTop: "20px", fontSize: "0.9rem", opacity: 0.6 }}>
+        <h1 className="error-header">{errorHeader}</h1>
+        <p className="error-text">{errorMsg}</p>
+        <div className="error-footer">
           Please contact Jeremy Glasser if you believe this is an error.
         </div>
       </main>
@@ -94,52 +94,27 @@ export default function App() {
   }
 
   return (
-    <main className="status-container" style={{ minHeight: '100vh', justifyContent: 'center' }}>
-      <div style={{
-        maxWidth: '700px',
-        padding: '60px',
-        background: 'white',
-        borderRadius: '24px',
-        boxShadow: '0 20px 50px rgba(26, 34, 56, 0.1)',
-        textAlign: 'center'
-      }}>
-        <h1 style={{ fontSize: '3rem', marginBottom: '16px', color: 'var(--palette-primary)' }}>Welcome</h1>
-        <p style={{ fontSize: '1.25rem', color: '#555', marginBottom: '40px', lineHeight: '1.6' }}>
-          Thank you for your interest in my professional background.
-          You have been granted exclusive access to view my detailed resume and career highlights.
+    <main className="status-container">
+      <div className="welcome-card">
+        <h1 className="welcome-title">Welcome</h1>
+        <p className="welcome-text">
+          You have been granted exclusive access to my professional portfolio.
+          Feel free to ask my AI assistant any questions before diving into the full resume.
         </p>
+
+        <ChatInterface />
 
         <button
           onClick={() => router.push({ pathname: '/resume', query: { key: router.query.key } })}
-          style={{
-            background: 'var(--palette-primary)',
-            color: 'white',
-            padding: '18px 40px',
-            borderRadius: '12px',
-            fontSize: '1.1rem',
-            fontWeight: 600,
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 10px 20px rgba(26, 34, 56, 0.2)'
-          }}
           className="cta-button"
         >
-          View Professional Resume
+          View Full Professional Resume
         </button>
       </div>
 
-      <footer style={{ marginTop: '40px', opacity: 0.5, fontSize: '0.9rem' }}>
+      <footer className="welcome-footer">
         Authorized access for key: <code>{router.query.key}</code>
       </footer>
-
-      <style jsx>{`
-        .cta-button:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 15px 30px rgba(26, 34, 56, 0.3);
-          background: var(--palette-secondary);
-        }
-      `}</style>
     </main>
   );
 }
