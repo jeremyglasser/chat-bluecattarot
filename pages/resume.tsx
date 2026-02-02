@@ -84,9 +84,9 @@ export default function ResumePage() {
     if (accessGranted === false) {
         return (
             <main className="status-container">
-                <h1 style={{ color: "var(--palette-secondary)", fontSize: "2.5rem" }}>{errorHeader}</h1>
-                <p style={{ maxWidth: "500px", margin: "20px 0" }}>{errorMsg}</p>
-                <div style={{ marginTop: "20px", fontSize: "0.9rem", opacity: 0.6 }}>
+                <h1 className="error-header">{errorHeader}</h1>
+                <p className="error-text">{errorMsg}</p>
+                <div className="error-footer">
                     Please contact Jeremy Glasser if you believe this is an error.
                 </div>
             </main>
@@ -98,16 +98,16 @@ export default function ResumePage() {
             <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
                 <button
                     onClick={() => router.push({ pathname: '/', query: { key: router.query.key } })}
+                    className="admin-link"
                     style={{
                         background: 'none',
                         border: 'none',
-                        color: 'var(--palette-secondary)',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px',
                         marginBottom: '20px',
-                        fontWeight: 600
+                        outline: 'none'
                     }}
                 >
                     ← Back to Welcome Page

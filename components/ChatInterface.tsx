@@ -162,21 +162,27 @@ export const ChatInterface = () => {
           border-color: var(--palette-secondary);
         }
         button {
-          background: var(--palette-primary);
-          color: var(--palette-neutral);
+          background: var(--palette-secondary);
+          color: white;
           border: none;
-          padding: 0 20px;
+          padding: 0 24px;
           border-radius: 25px;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.2s;
+          box-shadow: 0 2px 8px var(--shadow-color);
         }
         button:disabled {
           opacity: 0.5;
           cursor: not-allowed;
+          box-shadow: none;
         }
         button:not(:disabled):hover {
-          background: var(--palette-secondary);
+          filter: brightness(1.1);
+          transform: translateY(-1px);
+        }
+        button:not(:disabled):active {
+          transform: translateY(0);
         }
       `}</style>
     </div>

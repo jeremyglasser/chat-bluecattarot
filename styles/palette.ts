@@ -9,6 +9,6 @@ export const palette = {
     softTealSage: "#A0D2EB", // Calmness and clarity
   },
   neutral: {
-    offWhiteSlate: "#F8F9FA", // Transparency and "room to breathe"
+    slateNeutral: "#F1F5F9", // Professional slate background
   },
 };
