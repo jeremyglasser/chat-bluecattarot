@@ -30,6 +30,7 @@ const schema = a.schema({
   ResumeConfig: a
     .model({
       id: a.string().required(),
+      name: a.string(),
       content: a.string().required(),
     })
     .identifier(["id"])

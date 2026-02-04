@@ -8,7 +8,7 @@ const client = generateClient<Schema>({
     authMode: "userPool",
 });
 
-const DEFAULT_RESUME = `
+export const DEFAULT_RESUME = `
 [Your Name]
 [Current Title]
 
@@ -40,6 +40,7 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
     const [editLimit, setEditLimit] = useState<number>(10);
 
     // Resume State
+    const [resumeName, setResumeName] = useState("Jeremy Glasser");
     const [resumeContent, setResumeContent] = useState("");
     const [isSavingResume, setIsSavingResume] = useState(false);
     const [resumeMessage, setResumeMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
@@ -63,8 +64,10 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
             const { data, errors } = await client.models.ResumeConfig.get({ id: "main" });
             if (errors) throw errors;
             if (data) {
+                setResumeName(data.name || "Jeremy Glasser");
                 setResumeContent(data.content);
             } else {
+                setResumeName("Jeremy Glasser");
                 setResumeContent(DEFAULT_RESUME.trim());
             }
         } catch (err) {
@@ -132,11 +135,13 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
             if (data) {
                 await client.models.ResumeConfig.update({
                     id: "main",
+                    name: resumeName,
                     content: resumeContent
                 });
             } else {
                 await client.models.ResumeConfig.create({
                     id: "main",
+                    name: resumeName,
                     content: resumeContent
                 });
             }
@@ -306,19 +311,33 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
                             This data is used as the System Instruction for Gemini. Updates here will immediately change how the AI answers questions about your background.
                         </p>
 
-                        <textarea
-                            value={resumeContent}
-                            onChange={(e) => setResumeContent(e.target.value)}
-                            className="admin-input"
-                            style={{
-                                width: '100%',
-                                minHeight: '600px',
-                                fontFamily: 'monospace',
-                                lineHeight: '1.5',
-                                resize: 'vertical'
-                            }}
-                            placeholder="Enter resume data in markdown format..."
-                        />
+                        <div style={{ marginBottom: '24px' }}>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: 'var(--text-primary)' }}>Professional Name</label>
+                            <input
+                                value={resumeName}
+                                onChange={(e) => setResumeName(e.target.value)}
+                                className="admin-input"
+                                style={{ width: '100%', maxWidth: '400px' }}
+                                placeholder="Your Name"
+                            />
+                        </div>
+
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: 'var(--text-primary)' }}>Resume Content (Markdown)</label>
+                            <textarea
+                                value={resumeContent}
+                                onChange={(e) => setResumeContent(e.target.value)}
+                                className="admin-input"
+                                style={{
+                                    width: '100%',
+                                    minHeight: '600px',
+                                    fontFamily: 'monospace',
+                                    lineHeight: '1.5',
+                                    resize: 'vertical'
+                                }}
+                                placeholder="Enter resume data in markdown format..."
+                            />
+                        </div>
                     </section>
                 )
             }

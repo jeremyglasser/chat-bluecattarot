@@ -13,6 +13,7 @@ export default function App() {
   const [accessGranted, setAccessGranted] = useState<boolean | null>(null);
   const [errorHeader, setErrorHeader] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string>("");
+  const [resumeName, setResumeName] = useState<string>("Jeremy Glasser");
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -60,6 +61,12 @@ export default function App() {
           usageCount: currentUsage + 1,
         });
 
+        // Fetch dynamic name if available
+        const { data: config } = await client.models.ResumeConfig.get({ id: "main" });
+        if (config?.name) {
+          setResumeName(config.name);
+        }
+
         setAccessGranted(true);
       } catch (err) {
         console.error("Error validating key:", err);
@@ -87,7 +94,7 @@ export default function App() {
         <h1 className="error-header">{errorHeader}</h1>
         <p className="error-text">{errorMsg}</p>
         <div className="error-footer">
-          Please contact Jeremy Glasser if you believe this is an error.
+          Please contact {resumeName} if you believe this is an error.
         </div>
       </main>
     );
@@ -102,7 +109,7 @@ export default function App() {
           Feel free to ask my AI assistant any questions before diving into the full resume.
         </p>
 
-        <ChatInterface />
+        <ChatInterface name={resumeName} />
 
         <button
           onClick={() => router.push({ pathname: '/resume', query: { key: router.query.key } })}

@@ -6,10 +6,18 @@ interface Message {
   content: string;
 }
 
-export const ChatInterface = () => {
+export const ChatInterface = ({ name = "Jeremy" }: { name?: string }) => {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: "Hi! I'm Jeremy's AI assistant. Ask me anything about his experience, skills, or projects!" }
+    { role: 'assistant', content: `Hi! I'm ${name.split(' ')[0]}'s AI assistant. Ask me anything about their experience, skills, or projects!` }
   ]);
+
+  useEffect(() => {
+    // Update initial message if it's the first render and name changed from default
+    setMessages([{
+      role: 'assistant',
+      content: `Hi! I'm ${name.split(' ')[0]}'s AI assistant. Ask me anything about their experience, skills, or projects!`
+    }]);
+  }, [name]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
