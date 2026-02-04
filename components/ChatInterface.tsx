@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -57,7 +58,7 @@ export const ChatInterface = () => {
         {messages.map((m, i) => (
           <div key={i} className={`message-wrapper ${m.role}`}>
             <div className="message-bubble">
-              {m.content}
+              <ReactMarkdown>{m.content}</ReactMarkdown>
             </div>
           </div>
         ))}
@@ -95,6 +96,7 @@ export const ChatInterface = () => {
           margin-bottom: 30px;
           overflow: hidden;
           box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+          text-align: left; /* Reset centering from parent */
         }
         .chat-messages {
           flex: 1;
@@ -111,12 +113,26 @@ export const ChatInterface = () => {
         .message-wrapper.user {
           justify-content: flex-end;
         }
+        .message-wrapper.assistant {
+          justify-content: flex-start;
+        }
         .message-bubble {
-          max-width: 80%;
-          padding: 12px 16px;
+          max-width: 70%;
+          padding: 14px 18px;
           border-radius: 18px;
           font-size: 0.95rem;
-          line-height: 1.4;
+          line-height: 1.6;
+          text-align: left;
+        }
+        .message-bubble :global(p) {
+          margin-bottom: 12px;
+        }
+        .message-bubble :global(p:last-child) {
+          margin-bottom: 0;
+        }
+        .message-bubble :global(ul), .message-bubble :global(ol) {
+          margin-bottom: 12px;
+          padding-left: 20px;
         }
         .user .message-bubble {
           background: var(--palette-secondary);
