@@ -4,7 +4,6 @@ import { GoogleGenAI } from "@google/genai";
 const RESUME_DATA = `
 Jeremy Glasser
 Senior Software Engineer & Technical Leader
-Omaha, NE | [REDACTED_EMAIL] | [REDACTED_PHONE]
 
 Summary:
 Full-stack technical leader with over 20 years of experience building scalable distributed systems,
@@ -39,6 +38,17 @@ Certifications:
 - Active U.S. Top Secret Clearance
 `;
 
+import { Amplify } from "aws-amplify";
+import { generateClient } from "aws-amplify/data";
+import outputs from "@/amplify_outputs.json";
+import type { Schema } from "@/amplify/data/resource";
+
+Amplify.configure(outputs);
+
+const dataClient = generateClient<Schema>({
+  authMode: "apiKey",
+});
+
 // Initialize the Google GenAI SDK
 const genAI = new GoogleGenAI({});
 
@@ -55,6 +65,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   if (!process.env.GEMINI_MODEL) {
     return res.status(500).json({ reply: "I'm sorry, I haven't been configured with an AI model yet. Please let Jeremy know!" });
+  }
+
+  // Fetch dynamic resume data from Amplify
+  let dynamicResume = RESUME_DATA;
+  try {
+    const { data: config } = await dataClient.models.ResumeConfig.get({ id: "main" });
+    if (config?.content) {
+      dynamicResume = config.content;
+    }
+  } catch (err) {
+    console.error("Error fetching dynamic resume data:", err);
+    // Fallback to hardcoded RESUME_DATA
   }
 
   try {
@@ -87,7 +109,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         4. Focus exclusively on Jeremy's career.
 
         RESUME_DATA:
-        ${RESUME_DATA}`
+        ${dynamicResume}`
       }
     });
 

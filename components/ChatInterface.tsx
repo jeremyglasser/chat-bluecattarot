@@ -84,6 +84,7 @@ export const ChatInterface = () => {
           Send
         </button>
       </form>
+      {/* todo: move to styled components or app.css*/}
 
       <style jsx>{`
         .chat-interface {
