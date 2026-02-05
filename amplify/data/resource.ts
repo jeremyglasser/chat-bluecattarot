@@ -32,6 +32,7 @@ const schema = a.schema({
       id: a.string().required(),
       name: a.string(),
       content: a.string().required(),
+      systemPrompt: a.string(),
     })
     .identifier(["id"])
     .authorization((allow) => [

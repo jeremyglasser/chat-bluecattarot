@@ -5,7 +5,7 @@ import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/data";
 import outputs from "@/amplify_outputs.json";
 import type { Schema } from "@/amplify/data/resource";
-import { DEFAULT_RESUME } from '../admin';
+import { DEFAULT_RESUME, DEFAULT_SYSTEM_PROMPT } from '../admin';
 
 Amplify.configure(outputs);
 
@@ -34,6 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Fetch dynamic resume data from Amplify
   let dynamicResume = DEFAULT_RESUME;
   let dynamicName = "Jeremy Glasser";
+  let systemPrompt = DEFAULT_SYSTEM_PROMPT;
   try {
     const { data: config } = await dataClient.models.ResumeConfig.get({ id: "main" });
     if (config?.content) {
@@ -42,10 +43,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (config?.name) {
       dynamicName = config.name;
     }
+    if (config?.systemPrompt) {
+      systemPrompt = config.systemPrompt;
+    }
   } catch (err) {
     console.error("Error fetching dynamic resume data:", err);
     // Fallback to defaults
   }
+
+  // Replace placeholders in system prompt
+  const finalSystemInstruction = systemPrompt
+    .replace(/{{name}}/g, dynamicName)
+    .replace(/{{resume}}/g, dynamicResume);
 
   try {
     // Map history to Gemini format, ensuring history starts with a 'user' message
@@ -67,17 +76,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         { role: 'user', parts: [{ text: message }] }
       ],
       config: {
-        systemInstruction: `You are the AI Assistant for ${dynamicName}'s professional portfolio.
-        Your goal is to answer questions about ${dynamicName}'s experience, skills, and projects using the provided RESUME_DATA.
-
-        Guidelines:
-        1. Be professional, friendly, and concise.
-        2. If asked something not in the resume, politely say you don't have that information.
-        3. Do not make up facts.
-        4. Focus exclusively on ${dynamicName}'s career.
-
-        RESUME_DATA:
-        ${dynamicResume}`
+        systemInstruction: finalSystemInstruction
       }
     });
 

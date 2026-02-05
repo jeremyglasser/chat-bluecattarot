@@ -29,6 +29,18 @@ Certifications:
 - [Your Certifications]
 `;
 
+export const DEFAULT_SYSTEM_PROMPT = `You are the AI Assistant for {{name}}'s professional portfolio.
+Your goal is to answer questions about {{name}}'s experience, skills, and projects using the provided RESUME_DATA.
+
+Guidelines:
+1. Be professional, friendly, and concise.
+2. If asked something not in the resume, politely say you don't have that information.
+3. Do not make up facts.
+4. Focus exclusively on {{name}}'s career.
+
+RESUME_DATA:
+{{resume}}`;
+
 function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any }) {
     const [activeTab, setActiveTab] = useState<'keys' | 'resume'>('keys');
 
@@ -42,6 +54,7 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
     // Resume State
     const [resumeName, setResumeName] = useState("Jeremy Glasser");
     const [resumeContent, setResumeContent] = useState("");
+    const [systemPrompt, setSystemPrompt] = useState("");
     const [isSavingResume, setIsSavingResume] = useState(false);
     const [resumeMessage, setResumeMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
@@ -66,9 +79,11 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
             if (data) {
                 setResumeName(data.name || "Jeremy Glasser");
                 setResumeContent(data.content);
+                setSystemPrompt(data.systemPrompt || DEFAULT_SYSTEM_PROMPT);
             } else {
                 setResumeName("Jeremy Glasser");
                 setResumeContent(DEFAULT_RESUME.trim());
+                setSystemPrompt(DEFAULT_SYSTEM_PROMPT);
             }
         } catch (err) {
             console.error("Error fetching resume data:", err);
@@ -136,13 +151,15 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
                 await client.models.ResumeConfig.update({
                     id: "main",
                     name: resumeName,
-                    content: resumeContent
+                    content: resumeContent,
+                    systemPrompt: systemPrompt
                 });
             } else {
                 await client.models.ResumeConfig.create({
                     id: "main",
                     name: resumeName,
-                    content: resumeContent
+                    content: resumeContent,
+                    systemPrompt: systemPrompt
                 });
             }
             setResumeMessage({ text: "Resume data saved successfully!", type: 'success' });
@@ -322,6 +339,26 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
                             />
                         </div>
 
+                        <div style={{ marginBottom: '24px' }}>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: 'var(--text-primary)' }}>System Instruction Prompt</label>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+                                Use <code>{"{{name}}"}</code> and <code>{"{{resume}}"}</code> as placeholders for your name and resume content.
+                            </p>
+                            <textarea
+                                value={systemPrompt}
+                                onChange={(e) => setSystemPrompt(e.target.value)}
+                                className="admin-input"
+                                style={{
+                                    width: '100%',
+                                    minHeight: '200px',
+                                    fontFamily: 'monospace',
+                                    lineHeight: '1.5',
+                                    resize: 'vertical'
+                                }}
+                                placeholder="Enter system instructions..."
+                            />
+                        </div>
+
                         <div>
                             <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: 'var(--text-primary)' }}>Resume Content (Markdown)</label>
                             <textarea
@@ -330,7 +367,7 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
                                 className="admin-input"
                                 style={{
                                     width: '100%',
-                                    minHeight: '600px',
+                                    minHeight: '500px',
                                     fontFamily: 'monospace',
                                     lineHeight: '1.5',
                                     resize: 'vertical'
@@ -341,6 +378,182 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
                     </section>
                 )
             }
+            <style jsx>{`
+                .admin-container {
+                    padding: 40px 20px;
+                    max-width: 1200px;
+                    margin: 0 auto;
+                }
+                .admin-header {
+                    margin-bottom: 40px;
+                }
+                .admin-header-content {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    margin-bottom: 30px;
+                }
+                .admin-tabs {
+                    display: flex;
+                    gap: 10px;
+                    border-bottom: 1px solid var(--border-color);
+                    padding-bottom: 0;
+                }
+                .admin-tab {
+                    padding: 12px 24px;
+                    background: none;
+                    border: none;
+                    border-bottom: 2px solid transparent;
+                    color: var(--text-secondary);
+                    cursor: pointer;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    transition: all 0.2s;
+                    font-size: 1rem;
+                }
+                .admin-tab:hover {
+                    color: var(--text-primary);
+                    background: var(--palette-neutral);
+                }
+                .admin-tab.active {
+                    color: var(--palette-secondary);
+                    border-bottom-color: var(--palette-secondary);
+                }
+                .admin-section {
+                    background: var(--card-bg);
+                    border: 1px solid var(--border-color);
+                    border-radius: 12px;
+                    padding: 30px;
+                    margin-bottom: 30px;
+                    box-shadow: 0 4px 20px var(--shadow-color);
+                }
+                .admin-section h2 {
+                    margin-top: 0;
+                    margin-bottom: 25px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    font-size: 1.5rem;
+                }
+                .create-key-form {
+                    display: flex;
+                    gap: 15px;
+                }
+                .admin-input {
+                    padding: 12px 16px;
+                    border: 1px solid var(--border-color);
+                    border-radius: 8px;
+                    background: var(--palette-neutral);
+                    color: var(--text-primary);
+                    font-size: 1rem;
+                }
+                .admin-input:focus {
+                    outline: none;
+                    border-color: var(--palette-secondary);
+                    box-shadow: 0 0 0 2px rgba(100, 108, 255, 0.1);
+                }
+                .admin-button {
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    border: none;
+                    font-size: 0.95rem;
+                }
+                .admin-button.primary {
+                    background: var(--palette-secondary);
+                    color: white;
+                }
+                .admin-button.secondary {
+                    background: var(--palette-neutral);
+                    color: var(--text-primary);
+                    border: 1px solid var(--border-color);
+                }
+                .admin-button.danger {
+                    background: #ff4d4d;
+                    color: white;
+                }
+                .admin-button.small {
+                    padding: 6px 12px;
+                    font-size: 0.85rem;
+                }
+                .admin-button:hover:not(:disabled) {
+                    filter: brightness(1.1);
+                    transform: translateY(-1px);
+                }
+                .admin-button:active:not(:disabled) {
+                    transform: translateY(0);
+                }
+                .admin-button:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+                .admin-table-container {
+                    overflow-x: auto;
+                }
+                .admin-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    text-align: left;
+                }
+                .admin-table th {
+                    padding: 15px;
+                    border-bottom: 2px solid var(--border-color);
+                    color: var(--text-secondary);
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    font-size: 0.8rem;
+                    letter-spacing: 0.05em;
+                }
+                .admin-table td {
+                    padding: 15px;
+                    border-bottom: 1px solid var(--border-color);
+                }
+                code {
+                    background: var(--palette-neutral);
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-family: monospace;
+                    font-size: 0.9rem;
+                    color: var(--palette-secondary);
+                }
+                .status-badge {
+                    padding: 4px 10px;
+                    border-radius: 12px;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                }
+                .status-badge.active {
+                    background: rgba(76, 175, 80, 0.1);
+                    color: #4caf50;
+                }
+                .status-badge.inactive {
+                    background: rgba(158, 158, 158, 0.1);
+                    color: #9e9e9e;
+                }
+                .action-buttons {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                }
+                .action-group {
+                    display: flex;
+                    gap: 8px;
+                    flex-wrap: wrap;
+                }
+                .admin-link {
+                    color: var(--palette-secondary);
+                    text-decoration: none;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                }
+                .admin-link:hover {
+                    text-decoration: underline;
+                }
+            `}</style>
         </main >
     );
 }
