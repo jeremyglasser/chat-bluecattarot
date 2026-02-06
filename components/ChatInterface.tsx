@@ -1,25 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { generateClient } from 'aws-amplify/data';
+import type { Schema } from '@/amplify/data/resource';
+
+const client = generateClient<Schema>({
+  authMode: 'apiKey',
+});
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
 }
 
-export const ChatInterface = ({ name = "Jeremy" }: { name?: string }) => {
-  const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: `Hi! I'm ${name.split(' ')[0]}'s AI assistant. Ask me anything about their experience, skills, or projects!` }
-  ]);
-
-  useEffect(() => {
-    // Update initial message if it's the first render and name changed from default
-    setMessages([{
-      role: 'assistant',
-      content: `Hi! I'm ${name.split(' ')[0]}'s AI assistant. Ask me anything about their experience, skills, or projects!`
-    }]);
-  }, [name]);
+export const ChatInterface = ({ name = "Jeremy", accessKey }: { name?: string, accessKey?: string }) => {
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isHistoryLoaded, setIsHistoryLoaded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -30,20 +27,75 @@ export const ChatInterface = ({ name = "Jeremy" }: { name?: string }) => {
     scrollToBottom();
   }, [messages]);
 
+  // Load chat history
+  useEffect(() => {
+    if (!accessKey) {
+      // If no access key, just show the default message
+      setMessages([{
+        role: 'assistant',
+        content: `Hi! I'm ${name.split(' ')[0]}'s AI assistant. Ask me anything about their experience, skills, or projects!`
+      }]);
+      setIsHistoryLoaded(true);
+      return;
+    }
+
+    const loadHistory = async () => {
+      try {
+        const { data: history } = await client.models.ChatMessage.list({
+          filter: { accessKey: { eq: accessKey } }
+        });
+
+        if (history && history.length > 0) {
+          // Sort by createdAt (default field in Amplify models)
+          const sortedHistory = [...history].sort((a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          );
+
+          setMessages(sortedHistory.map(m => ({
+            role: m.role as 'user' | 'assistant',
+            content: m.content
+          })));
+        } else {
+          // No history, set initial message
+          setMessages([{
+            role: 'assistant',
+            content: `Hi! I'm ${name.split(' ')[0]}'s AI assistant. Ask me anything about their experience, skills, or projects!`
+          }]);
+        }
+      } catch (err) {
+        console.error("Error loading chat history:", err);
+        // Fallback to initial message
+        setMessages([{
+          role: 'assistant',
+          content: `Hi! I'm ${name.split(' ')[0]}'s AI assistant. Ask me anything about their experience, skills, or projects!`
+        }]);
+      } finally {
+        setIsHistoryLoaded(true);
+      }
+    };
+
+    loadHistory();
+  }, [accessKey, name]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
     const userMessage = input.trim();
     setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    const newMessages = [...messages, { role: 'user' as const, content: userMessage }];
+    setMessages(newMessages);
     setIsLoading(true);
 
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage, history: messages }),
+        body: JSON.stringify({
+          message: userMessage,
+          history: messages,
+          accessKey: accessKey
+        }),
       });
 
       const data = await response.json();
@@ -86,13 +138,12 @@ export const ChatInterface = ({ name = "Jeremy" }: { name?: string }) => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask a question..."
-          disabled={isLoading}
+          disabled={isLoading || !isHistoryLoaded}
         />
-        <button type="submit" disabled={isLoading || !input.trim()}>
+        <button type="submit" disabled={isLoading || !input.trim() || !isHistoryLoaded}>
           Send
         </button>
       </form>
-      {/* todo: move to styled components or app.css*/}
 
       <style jsx>{`
         .chat-interface {

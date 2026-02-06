@@ -109,7 +109,7 @@ export default function App() {
           Feel free to ask my AI assistant any questions before diving into the full resume.
         </p>
 
-        <ChatInterface name={resumeName} />
+        <ChatInterface name={resumeName} accessKey={router.query.key as string} />
 
         <button
           onClick={() => router.push({ pathname: '/resume', query: { key: router.query.key } })}

@@ -39,6 +39,18 @@ const schema = a.schema({
       allow.publicApiKey().to(["read"]),
       allow.authenticated(),
     ]),
+
+  ChatMessage: a
+    .model({
+      accessKey: a.string().required(),
+      role: a.string().required(), // 'user' | 'assistant'
+      content: a.string().required(),
+    })
+    .secondaryIndexes((index) => [index("accessKey")])
+    .authorization((allow) => [
+      allow.publicApiKey(),
+      allow.authenticated(),
+    ]),
 });
 
 export type Schema = ClientSchema<typeof schema>;

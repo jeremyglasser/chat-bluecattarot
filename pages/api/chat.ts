@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { message, history } = req.body;
+  const { message, history, accessKey } = req.body;
 
   if (!process.env.GEMINI_API_KEY) {
     return res.status(500).json({ reply: "I'm sorry, I haven't been configured with an API key yet. Please let Jeremy know!" });
@@ -64,6 +64,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         parts: [{ text: msg.content }],
       }));
 
+    // If we have an access key, persist the conversation
+    if (accessKey) {
+      try {
+        // If this is the first real message, save the initial greeting if it's in history
+        if (history && history.length === 1 && history[0].role === 'assistant') {
+          await dataClient.models.ChatMessage.create({
+            accessKey,
+            role: 'assistant',
+            content: history[0].content
+          });
+        }
+
+        // Save user message
+        await dataClient.models.ChatMessage.create({
+          accessKey,
+          role: 'user',
+          content: message
+        });
+      } catch (dbErr) {
+        console.error("Error persisting user message:", dbErr);
+      }
+    }
+
     // Gemini requires chat history to start with a 'user' message
     const firstUserIndex = formattedHistory.findIndex((msg: any) => msg.role === 'user');
     const startHistory = firstUserIndex !== -1 ? formattedHistory.slice(firstUserIndex) : [];
@@ -82,6 +105,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const reply = response.candidates?.[0]?.content?.parts?.[0]?.text ||
                   "I'm sorry, I couldn't generate a response. Please try again.";
+
+    // Save assistant reply if we have an access key
+    if (accessKey && reply) {
+      try {
+        await dataClient.models.ChatMessage.create({
+          accessKey,
+          role: 'assistant',
+          content: reply
+        });
+      } catch (dbErr) {
+        console.error("Error persisting assistant reply:", dbErr);
+      }
+    }
 
     res.status(200).json({ reply });
   } catch (error: any) {
