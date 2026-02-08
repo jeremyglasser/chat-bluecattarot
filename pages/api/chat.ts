@@ -13,10 +13,6 @@ const dataClient = generateClient<Schema>({
   authMode: "apiKey",
 });
 
-// Initialize the Google GenAI SDK
-const genAI = new GoogleGenAI({});
-
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
@@ -24,17 +20,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { message, history, accessKey } = req.body;
 
-  if (!process.env.GEMINI_API_KEY) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  const modelName = process.env.GEMINI_MODEL;
+
+  if (!apiKey) {
     return res.status(500).json({ reply: "I'm sorry, I haven't been configured with an API key yet. Please let Jeremy know!" });
   }
-  if (!process.env.GEMINI_MODEL) {
+  if (!modelName) {
     return res.status(500).json({ reply: "I'm sorry, I haven't been configured with an AI model yet. Please let Jeremy know!" });
   }
+
+  // Initialize the Google GenAI SDK with the API key
+  const genAI = new GoogleGenAI({ apiKey });
 
   // Fetch dynamic resume data from Amplify
   let dynamicResume = DEFAULT_RESUME;
   let dynamicName = "Jeremy Glasser";
   let systemPrompt = DEFAULT_SYSTEM_PROMPT;
+
   try {
     const { data: config } = await dataClient.models.ResumeConfig.get({ id: "main" });
     if (config?.content) {
@@ -57,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     .replace(/{{resume}}/g, dynamicResume);
 
   try {
-    // Map history to Gemini format, ensuring history starts with a 'user' message
+    // Map history to Gemini format
     const formattedHistory = (history || [])
       .map((msg: any) => ({
         role: msg.role === 'assistant' ? 'model' : 'user',
@@ -67,7 +70,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // If we have an access key, persist the conversation
     if (accessKey) {
       try {
-        // If this is the first real message, save the initial greeting if it's in history
         if (history && history.length === 1 && history[0].role === 'assistant') {
           await dataClient.models.ChatMessage.create({
             accessKey,
@@ -76,7 +78,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           });
         }
 
-        // Save user message
         await dataClient.models.ChatMessage.create({
           accessKey,
           role: 'user',
@@ -91,9 +92,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const firstUserIndex = formattedHistory.findIndex((msg: any) => msg.role === 'user');
     const startHistory = firstUserIndex !== -1 ? formattedHistory.slice(firstUserIndex) : [];
 
-    // Use the newest generation of models
+    // Use the models.generateContent method from the internal SDK
     const response = await genAI.models.generateContent({
-      model: process.env.GEMINI_MODEL,
+      model: modelName,
       contents: [
         ...startHistory,
         { role: 'user', parts: [{ text: message }] }
@@ -105,6 +106,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const reply = response.candidates?.[0]?.content?.parts?.[0]?.text ||
                   "I'm sorry, I couldn't generate a response. Please try again.";
+
 
     // Save assistant reply if we have an access key
     if (accessKey && reply) {

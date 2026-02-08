@@ -9,7 +9,10 @@ frontend:
   phases:
     build:
       commands:
+        - echo "GEMINI_API_KEY=$GEMINI_API_KEY" >> .env.production
+        - echo "GEMINI_MODEL=$GEMINI_MODEL" >> .env.production
         - npm run build
+
   artifacts:
     baseDirectory: .next
     files:

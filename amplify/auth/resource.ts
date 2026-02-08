@@ -1,10 +1,4 @@
-import { defineAuth, defineFunction } from '@aws-amplify/backend';
-import * as dotenv from 'dotenv';
-import * as path from 'path';
-
-// Load environment variables from .env.local
-dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
-
+import { defineAuth, defineFunction, secret } from '@aws-amplify/backend';
 
 /**
  * Define and configure your auth resource
@@ -19,9 +13,9 @@ export const auth = defineAuth({
       name: 'preSignUp',
       entry: './pre-sign-up.handler.ts',
       environment: {
-        ADMIN_WHITELIST: process.env.ADMIN_WHITELIST || ''
+        ADMIN_WHITELIST: secret('ADMIN_WHITELIST')
       }
     })
   }
-
 });
+
