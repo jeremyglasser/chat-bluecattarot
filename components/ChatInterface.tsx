@@ -402,7 +402,40 @@ export const ChatInterface = ({ name = "Jeremy", accessKey }: { name?: string, a
         .chat-input-area button:not(:disabled):active {
           transform: translateY(0);
         }
+
+        @media (max-width: 480px) {
+          .chat-interface {
+            height: 380px;
+            margin-bottom: 20px;
+          }
+          .chat-messages {
+            padding: 8px;
+            gap: 6px;
+          }
+          .message-bubble {
+            max-width: 92%;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+          }
+          .chat-input-area {
+            padding: 6px;
+            gap: 4px;
+          }
+          .chat-input-area button {
+            padding: 0 10px;
+            font-size: 0.8rem;
+          }
+          input {
+            padding: 6px 10px;
+            font-size: 0.85rem;
+          }
+          .chat-title {
+            font-size: 0.75rem;
+          }
+        }
       `}</style>
+
+
     </div>
   );
 };

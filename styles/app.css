@@ -793,3 +793,110 @@ main {
 .admin-link:hover {
   text-decoration: underline;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .profile-container {
+    margin: 20px 10px;
+    border-radius: 12px;
+  }
+
+  .profile-header {
+    padding: 60px 20px;
+  }
+
+  .name {
+    font-size: 2.2rem;
+  }
+
+  .title {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+  }
+
+  .profile-section {
+    padding: 24px 20px;
+  }
+
+  .exp-header {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .exp-date {
+    margin-bottom: 4px;
+  }
+
+  .welcome-card {
+    max-width: 95vw;
+    padding: 30px 20px;
+    border-radius: 16px;
+  }
+
+  .welcome-title {
+    font-size: 2.2rem;
+  }
+
+  .welcome-text {
+    font-size: 1rem;
+    margin-bottom: 30px;
+  }
+
+  .cta-button {
+    width: 100%;
+    padding: 14px 24px;
+    font-size: 1rem;
+  }
+
+  .skills-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .name {
+    font-size: 1.8rem;
+  }
+
+  .contact-info {
+    font-size: 0.85rem;
+    gap: 8px;
+  }
+
+  .separator {
+    display: none;
+  }
+
+  .contact-info a {
+    display: block;
+    width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  .welcome-card {
+    padding: 20px 10px;
+  }
+
+  .welcome-title {
+    font-size: 1.8rem;
+  }
+
+  .profile-section {
+    padding: 20px 12px;
+  }
+
+  .chat-interface {
+    margin-left: -5px;
+    margin-right: -5px;
+  }
+
+  .name {
+    font-size: 1.5rem;
+  }
+}
