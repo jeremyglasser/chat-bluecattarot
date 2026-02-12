@@ -13,7 +13,7 @@ export default function App() {
   const [accessGranted, setAccessGranted] = useState<boolean | null>(null);
   const [errorHeader, setErrorHeader] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string>("");
-  const [resumeName, setResumeName] = useState<string>("Jeremy Glasser");
+  const [contextName, setContextName] = useState<string>("Chris Wolfgang");
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -62,9 +62,9 @@ export default function App() {
         });
 
         // Fetch dynamic name if available
-        const { data: config } = await client.models.ResumeConfig.get({ id: "main" });
+        const { data: config } = await client.models.ChatbotContext.get({ id: "main" });
         if (config?.name) {
-          setResumeName(config.name);
+          setContextName(config.name);
         }
 
         setAccessGranted(true);
@@ -94,7 +94,7 @@ export default function App() {
         <h1 className="error-header">{errorHeader}</h1>
         <p className="error-text">{errorMsg}</p>
         <div className="error-footer">
-          Please contact {resumeName} if you believe this is an error.
+          Please contact {contextName} if you believe this is an error.
         </div>
       </main>
     );
@@ -105,17 +105,17 @@ export default function App() {
       <div className="welcome-card">
         <h1 className="welcome-title">Welcome</h1>
         <p className="welcome-text">
-          You have been granted exclusive access to my professional portfolio.
-          Feel free to ask my AI assistant any questions before diving into the full resume.
+          You have been granted exclusive access to this interactive chatbot.
+          Feel free to ask questions and explore the context provided below.
         </p>
 
-        <ChatInterface name={resumeName} accessKey={router.query.key as string} />
+        <ChatInterface name={contextName} accessKey={router.query.key as string} />
 
         <button
-          onClick={() => router.push({ pathname: '/resume', query: { key: router.query.key } })}
+          onClick={() => router.push({ pathname: '/more-info', query: { key: router.query.key } })}
           className="cta-button"
         >
-          View Full Professional Resume
+          Learn More
         </button>
       </div>
 

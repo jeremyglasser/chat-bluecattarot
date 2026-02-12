@@ -27,7 +27,7 @@ const schema = a.schema({
       allow.authenticated(),
     ]),
 
-  ResumeConfig: a
+  ChatbotContext: a
     .model({
       id: a.string().required(),
       name: a.string(),

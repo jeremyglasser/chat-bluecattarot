@@ -8,41 +8,30 @@ const client = generateClient<Schema>({
     authMode: "userPool",
 });
 
-export const DEFAULT_RESUME = `
-[Your Name]
-[Current Title]
+export const DEFAULT_CHATBOT_CONTEXT = `
+[Explanation of what Blue Cat Tarot is and tarot in general]
+[Brief Description of various offerings]
+[Chris Wolfgang's background and experience]
 
-Summary:
-[Your Name] is a very trustworthy and reliable person who is passionate about building great products.
-
-Experience:
-- [Company Name] ([Start Date] - [End Date]): [Your Title]
-  - [Description of your responsibilities and accomplishments]
-
-Skills:
-- [List your skills]
-
-Education:
-- [Your Education]
-
-Certifications:
-- [Your Certifications]
+Details:
+- [Key fact about this context]
+- [Another key fact]
+- [More relevant details]
 `;
 
-export const DEFAULT_SYSTEM_PROMPT = `You are the AI Assistant for {{name}}'s professional portfolio.
-Your goal is to answer questions about {{name}}'s experience, skills, and projects using the provided RESUME_DATA.
+export const DEFAULT_SYSTEM_PROMPT = `You are the AI Assistant for {{name}}.
+Your goal is to answer questions using the provided CONTEXT_DATA.
 
 Guidelines:
-1. Be professional, friendly, and concise.
-2. If asked something not in the resume, politely say you don't have that information.
+1. Be helpful, friendly, and concise.
+2. If asked something not in the context, politely say you don't have that information.
 3. Do not make up facts.
-4. Focus exclusively on {{name}}'s career.
 
-RESUME_DATA:
-{{resume}}`;
+CONTEXT_DATA:
+{{context}}`;
 
 function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any }) {
-    const [activeTab, setActiveTab] = useState<'keys' | 'resume'>('keys');
+    const [activeTab, setActiveTab] = useState<'keys' | 'context'>('keys');
 
     // Keys State
     const [keys, setKeys] = useState<Array<Schema["AccessKey"]["type"]>>([]);
@@ -51,16 +40,16 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
     const [editingKey, setEditingKey] = useState<string | null>(null);
     const [editLimit, setEditLimit] = useState<number>(10);
 
-    // Resume State
-    const [resumeName, setResumeName] = useState("Jeremy Glasser");
-    const [resumeContent, setResumeContent] = useState("");
+    // Context State
+    const [contextName, setContextName] = useState("Chris Wolfgang");
+    const [chatbotContext, setChatbotContext] = useState("");
     const [systemPrompt, setSystemPrompt] = useState("");
-    const [isSavingResume, setIsSavingResume] = useState(false);
-    const [resumeMessage, setResumeMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+    const [isSavingContext, setIsSavingContext] = useState(false);
+    const [contextMessage, setContextMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
     useEffect(() => {
         fetchKeys();
-        fetchResumeData();
+        fetchChatbotContext();
     }, []);
 
     const fetchKeys = async () => {
@@ -72,21 +61,21 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
         }
     };
 
-    const fetchResumeData = async () => {
+    const fetchChatbotContext = async () => {
         try {
-            const { data, errors } = await client.models.ResumeConfig.get({ id: "main" });
+            const { data, errors } = await client.models.ChatbotContext.get({ id: "main" });
             if (errors) throw errors;
             if (data) {
-                setResumeName(data.name || "Jeremy Glasser");
-                setResumeContent(data.content);
+                setContextName(data.name || "Chris Wolfgang");
+                setChatbotContext(data.content);
                 setSystemPrompt(data.systemPrompt || DEFAULT_SYSTEM_PROMPT);
             } else {
-                setResumeName("Jeremy Glasser");
-                setResumeContent(DEFAULT_RESUME.trim());
+                setContextName("Chris Wolfgang");
+                setChatbotContext(DEFAULT_CHATBOT_CONTEXT.trim());
                 setSystemPrompt(DEFAULT_SYSTEM_PROMPT);
             }
         } catch (err) {
-            console.error("Error fetching resume data:", err);
+            console.error("Error fetching chatbot context:", err);
         }
     };
 
@@ -141,33 +130,33 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
         setEditLimit(currentLimit);
     };
 
-    const handleSaveResume = async () => {
-        setIsSavingResume(true);
-        setResumeMessage(null);
+    const handleSaveContext = async () => {
+        setIsSavingContext(true);
+        setContextMessage(null);
         try {
-            const { data } = await client.models.ResumeConfig.get({ id: "main" });
+            const { data } = await client.models.ChatbotContext.get({ id: "main" });
 
             if (data) {
-                await client.models.ResumeConfig.update({
+                await client.models.ChatbotContext.update({
                     id: "main",
-                    name: resumeName,
-                    content: resumeContent,
+                    name: contextName,
+                    content: chatbotContext,
                     systemPrompt: systemPrompt
                 });
             } else {
-                await client.models.ResumeConfig.create({
+                await client.models.ChatbotContext.create({
                     id: "main",
-                    name: resumeName,
-                    content: resumeContent,
+                    name: contextName,
+                    content: chatbotContext,
                     systemPrompt: systemPrompt
                 });
             }
-            setResumeMessage({ text: "Resume data saved successfully!", type: 'success' });
+            setContextMessage({ text: "Context data saved successfully!", type: 'success' });
         } catch (err) {
-            console.error("Error saving resume data:", err);
-            setResumeMessage({ text: "Failed to save resume data.", type: 'error' });
+            console.error("Error saving context data:", err);
+            setContextMessage({ text: "Failed to save context data.", type: 'error' });
         } finally {
-            setIsSavingResume(false);
+            setIsSavingContext(false);
         }
     };
 
@@ -190,10 +179,10 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
                         <span>🔑</span> Access Keys
                     </button>
                     <button
-                        className={`admin-tab ${activeTab === 'resume' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('resume')}
+                        className={`admin-tab ${activeTab === 'context' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('context')}
                     >
-                        <span>📝</span> Resume Content
+                        <span>📝</span> Chatbot Context
                     </button>
                 </div>
             </div>
@@ -301,48 +290,48 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
                 ) : (
                     <section className="admin-section">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                            <h2 style={{ margin: 0 }}><span>📝</span> Edit AI Grounding Data</h2>
+                            <h2 style={{ margin: 0 }}><span>📝</span> Edit Chatbot Grounding Data</h2>
                             <button
-                                onClick={handleSaveResume}
-                                disabled={isSavingResume}
+                                onClick={handleSaveContext}
+                                disabled={isSavingContext}
                                 className="admin-button primary"
                             >
-                                {isSavingResume ? "Saving..." : "Save Changes"}
+                                {isSavingContext ? "Saving..." : "Save Changes"}
                             </button>
                         </div>
 
-                        {resumeMessage && (
-                            <div className={`status-message ${resumeMessage.type}`} style={{
+                        {contextMessage && (
+                            <div className={`status-message ${contextMessage.type}`} style={{
                                 padding: '12px',
                                 borderRadius: '8px',
                                 marginBottom: '20px',
-                                background: resumeMessage.type === 'success' ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
-                                color: resumeMessage.type === 'success' ? '#4caf50' : '#f44336',
-                                border: `1px solid ${resumeMessage.type === 'success' ? '#4caf50' : '#f44336'}`
+                                background: contextMessage.type === 'success' ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
+                                color: contextMessage.type === 'success' ? '#4caf50' : '#f44336',
+                                border: `1px solid ${contextMessage.type === 'success' ? '#4caf50' : '#f44336'}`
                             }}>
-                                {resumeMessage.text}
+                                {contextMessage.text}
                             </div>
                         )}
 
                         <p style={{ color: 'var(--text-secondary)', marginBottom: '16px', fontSize: '0.9rem' }}>
-                            This data is used as the System Instruction for Gemini. Updates here will immediately change how the AI answers questions about your background.
+                            This data is used as the System Instruction for Gemini. Updates here will immediately change how the AI answers questions based on this context.
                         </p>
 
                         <div style={{ marginBottom: '24px' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: 'var(--text-primary)' }}>Professional Name</label>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: 'var(--text-primary)' }}>Chatbot Identity Name</label>
                             <input
-                                value={resumeName}
-                                onChange={(e) => setResumeName(e.target.value)}
+                                value={contextName}
+                                onChange={(e) => setContextName(e.target.value)}
                                 className="admin-input"
                                 style={{ width: '100%', maxWidth: '400px' }}
-                                placeholder="Your Name"
+                                placeholder="Identity Name"
                             />
                         </div>
 
                         <div style={{ marginBottom: '24px' }}>
                             <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: 'var(--text-primary)' }}>System Instruction Prompt</label>
                             <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>
-                                Use <code>{"{{name}}"}</code> and <code>{"{{resume}}"}</code> as placeholders for your name and resume content.
+                                Use <code>{"{{name}}"}</code> and <code>{"{{context}}"}</code> as placeholders for the name and context content.
                             </p>
                             <textarea
                                 value={systemPrompt}
@@ -360,10 +349,10 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
                         </div>
 
                         <div>
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: 'var(--text-primary)' }}>Resume Content (Markdown)</label>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: 'var(--text-primary)' }}>Chatbot Context (Markdown)</label>
                             <textarea
-                                value={resumeContent}
-                                onChange={(e) => setResumeContent(e.target.value)}
+                                value={chatbotContext}
+                                onChange={(e) => setChatbotContext(e.target.value)}
                                 className="admin-input"
                                 style={{
                                     width: '100%',
@@ -372,7 +361,7 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
                                     lineHeight: '1.5',
                                     resize: 'vertical'
                                 }}
-                                placeholder="Enter resume data in markdown format..."
+                                placeholder="Enter context data in markdown format..."
                             />
                         </div>
                     </section>

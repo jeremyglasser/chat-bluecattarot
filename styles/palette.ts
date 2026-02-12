@@ -1,14 +1,14 @@
 export const palette = {
   primary: {
-    midnightNavy: "#1A2238", // Authority, intelligence, and stability
+    midnightNavy: "#56bee0",
   },
   secondary: {
-    steelBlue: "#4A90E2", // Modernity, competence, and approachability
+    steelBlue: "#0088a9",
   },
   accent: {
-    softTealSage: "#A0D2EB", // Calmness and clarity
+    softTealSage: "#c3f9ff",
   },
   neutral: {
-    slateNeutral: "#F1F5F9", // Professional slate background
+    slateNeutral: "#7c3000"
   },
 };

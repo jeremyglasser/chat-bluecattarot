@@ -37,7 +37,7 @@ export const ChatInterface = ({ name = "Jeremy", accessKey }: { name?: string, a
       // If no access key, just show the default message
       setMessages([{
         role: 'assistant',
-        content: `Hi! I'm ${name.split(' ')[0]}'s AI assistant. Ask me anything about their experience, skills, or projects!`
+        content: `Hi! I'm ${name.split(' ')[0]}'s AI assistant. Ask me anything about Blue Cat Tarot!`
       }]);
       setIsHistoryLoaded(true);
       return;

@@ -5,7 +5,7 @@ import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/data";
 import outputs from "@/amplify_outputs.json";
 import type { Schema } from "@/amplify/data/resource";
-import { DEFAULT_RESUME, DEFAULT_SYSTEM_PROMPT } from '../admin';
+import { DEFAULT_CHATBOT_CONTEXT, DEFAULT_SYSTEM_PROMPT } from '../admin';
 
 Amplify.configure(outputs);
 
@@ -33,15 +33,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Initialize the Google GenAI SDK with the API key
   const genAI = new GoogleGenAI({ apiKey });
 
-  // Fetch dynamic resume data from Amplify
-  let dynamicResume = DEFAULT_RESUME;
-  let dynamicName = "Jeremy Glasser";
+  // Fetch dynamic chatbot context from Amplify
+  let dynamicContext = DEFAULT_CHATBOT_CONTEXT;
+  let dynamicName = "Chris Wolfgang";
   let systemPrompt = DEFAULT_SYSTEM_PROMPT;
 
   try {
-    const { data: config } = await dataClient.models.ResumeConfig.get({ id: "main" });
+    const { data: config } = await dataClient.models.ChatbotContext.get({ id: "main" });
     if (config?.content) {
-      dynamicResume = config.content;
+      dynamicContext = config.content;
     }
     if (config?.name) {
       dynamicName = config.name;
@@ -50,14 +50,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       systemPrompt = config.systemPrompt;
     }
   } catch (err) {
-    console.error("Error fetching dynamic resume data:", err);
+    console.error("Error fetching dynamic chatbot context:", err);
     // Fallback to defaults
   }
 
   // Replace placeholders in system prompt
   const finalSystemInstruction = systemPrompt
     .replace(/{{name}}/g, dynamicName)
-    .replace(/{{resume}}/g, dynamicResume);
+    .replace(/{{context}}/g, dynamicContext)
+    .replace(/{{resume}}/g, dynamicContext); // Legacy support for resume placeholder
 
   try {
     // Map history to Gemini format
