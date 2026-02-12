@@ -305,9 +305,9 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
                                 padding: '12px',
                                 borderRadius: '8px',
                                 marginBottom: '20px',
-                                background: contextMessage.type === 'success' ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
-                                color: contextMessage.type === 'success' ? '#4caf50' : '#f44336',
-                                border: `1px solid ${contextMessage.type === 'success' ? '#4caf50' : '#f44336'}`
+                                background: contextMessage.type === 'success' ? 'rgba(86, 190, 224, 0.1)' : 'rgba(255, 77, 77, 0.1)',
+                                color: contextMessage.type === 'success' ? 'var(--palette-primary)' : '#ff4d4d',
+                                border: `1px solid ${contextMessage.type === 'success' ? 'var(--palette-primary)' : '#ff4d4d'}`
                             }}>
                                 {contextMessage.text}
                             </div>
@@ -441,7 +441,7 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
                 .admin-input:focus {
                     outline: none;
                     border-color: var(--palette-secondary);
-                    box-shadow: 0 0 0 2px rgba(100, 108, 255, 0.1);
+                    box-shadow: 0 0 0 2px var(--palette-accent);
                 }
                 .admin-button {
                     padding: 12px 24px;
@@ -516,8 +516,8 @@ function AdminDashboard({ signOut, user }: { signOut?: () => void; user?: any })
                     font-weight: 600;
                 }
                 .status-badge.active {
-                    background: rgba(76, 175, 80, 0.1);
-                    color: #4caf50;
+                    background: rgba(86, 190, 224, 0.1);
+                    color: var(--palette-primary);
                 }
                 .status-badge.inactive {
                     background: rgba(158, 158, 158, 0.1);

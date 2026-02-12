@@ -103,7 +103,7 @@ export default function MoreInfoPage() {
     }
 
     return (
-        <main style={{ minHeight: '100vh', background: 'var(--bg-color)' }}>
+        <main style={{ minHeight: '100vh', background: 'var(--palette-neutral)' }}>
             <div style={{ padding: '40px 20px', maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
                 <button
                     onClick={() => router.push({ pathname: '/', query: { key: router.query.key } })}

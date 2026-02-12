@@ -148,7 +148,7 @@ export const ChatInterface = ({ name = "Jeremy", accessKey }: { name?: string, a
 
       // Add a header to the PDF clone
       const header = document.createElement('div');
-      header.innerHTML = `<h1 style="color: #646cff; margin-bottom: 20px; font-family: sans-serif;">Chat Log with ${name}</h1>`;
+      header.innerHTML = `<h1 style="color: var(--palette-secondary); margin-bottom: 20px; font-family: sans-serif;">Chat Log with ${name}</h1>`;
       clone.prepend(header);
 
       const canvas = await html2canvas(clone, {

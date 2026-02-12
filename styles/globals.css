@@ -1,15 +1,17 @@
 :root {
-  --palette-primary: #FFFFFF;
-  --palette-secondary: #4A90E2;
-  --palette-accent: #A0D2EB;
-  --palette-neutral: #0F172A;
+  --palette-primary: #56bee0;
+  --palette-secondary: #0088a9;
+  --palette-accent: #c3f9ff;
+  --palette-neutral: #1a2238;
+  /* Sticking to a dark navy for dark background as it fits 'Blue Cat' better than brown */
+  --palette-neutral-brown: #7c3000;
 
-  --card-bg: #161B22;
-  --border-color: #30363D;
-  --text-primary: #F8F9FA;
-  --text-secondary: #C9D1D9;
-  --text-muted: #8B949E;
-  --shadow-color: rgba(0, 0, 0, 0.3);
+  --card-bg: #212b45;
+  --border-color: #313f5f;
+  --text-primary: #f8f9fa;
+  --text-secondary: #c9d1d9;
+  --text-muted: #8b949e;
+  --shadow-color: rgba(0, 0, 0, 0.4);
 
   /* Amplify UI Overrides for Dark Mode */
   --amplify-colors-brand-primary-10: var(--palette-accent);
@@ -27,17 +29,17 @@
 }
 
 [data-theme='light'] {
-  --palette-primary: #1A2238;
-  --palette-secondary: #4A90E2;
-  --palette-accent: #A0D2EB;
-  --palette-neutral: #F1F5F9;
+  --palette-primary: #0088a9;
+  --palette-secondary: #56bee0;
+  --palette-accent: #c3f9ff;
+  --palette-neutral: #f1f5f9;
 
-  --card-bg: #FFFFFF;
-  --border-color: #EEEEEE;
-  --text-primary: #1A2238;
-  --text-secondary: #444444;
-  --text-muted: #666666;
-  --shadow-color: rgba(26, 34, 56, 0.08);
+  --card-bg: #ffffff;
+  --border-color: #e2e8f0;
+  --text-primary: #1a2238;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --shadow-color: rgba(0, 88, 110, 0.08);
 
   /* Amplify UI Overrides for Light Mode */
   --amplify-colors-font-primary: var(--text-primary);
