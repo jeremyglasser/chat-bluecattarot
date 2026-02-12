@@ -12,9 +12,45 @@ This template equips you with a foundational Next.js application integrated with
 - **API**: Ready-to-use GraphQL endpoint with AWS AppSync.
 - **Database**: Real-time database powered by Amazon DynamoDB.
 
-## Deploying to AWS
+## Local Development
 
-For detailed instructions on deploying your application, refer to the [deployment section](https://docs.amplify.aws/nextjs/start/quickstart/nextjs-pages-router/#deploy-a-fullstack-app-to-aws) of our documentation.
+### 1. Prerequisites
+Ensure you have the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) installed and configured with your credentials.
+
+### 2. Install Dependencies
+```bash
+npm install
+```
+
+### 3. Start Amplify Sandbox
+The sandbox provides an isolated backend environment for your local development.
+```bash
+npx ampx sandbox
+```
+
+### 4. Configure Secrets
+For backend functions (like the Auth pre-sign-up trigger) and the bridged environment in production, you must set your secrets in the Amplify Secret Store. Run these commands in your terminal:
+
+```bash
+# Required for the AI Chat API
+npx ampx sandbox secret set GEMINI_API_KEY
+npx ampx sandbox secret set GEMINI_MODEL
+
+# Required for Admin access control
+npx ampx sandbox secret set ADMIN_WHITELIST
+
+# Optional / Project Metadata
+npx ampx sandbox secret set GEMINI_PROJECT_NUMBER
+```
+
+> **Note**: When prompted, paste the corresponding values from your `.env.local` file. This securely stores the values in AWS SSM Parameter Store so your Lambda functions can access them.
+
+### 5. Running the Frontend
+Once the sandbox is running and secrets are set, start the Next.js dev server:
+```bash
+npm run dev
+```
+The app will be available at `http://localhost:3003`.
 
 ## Security
 
